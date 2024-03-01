@@ -21,6 +21,8 @@ repositories {
 
 dependencies {
     //подключить Postgres
+    implementation("com.h2database:h2:2.2.222")
+    implementation("org.postgresql:postgresql:42.1.4")
     implementation("com.zaxxer:HikariCP:5.0.1")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.15.2")
     implementation("org.apache.commons:commons-text:1.10.0")
