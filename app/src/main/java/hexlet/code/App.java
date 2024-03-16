@@ -5,7 +5,10 @@ import com.zaxxer.hikari.HikariDataSource;
 import gg.jte.ContentType;
 import gg.jte.TemplateEngine;
 import gg.jte.resolve.ResourceCodeResolver;
+import hexlet.code.controller.MainController;
+import hexlet.code.controller.UrlController;
 import hexlet.code.repository.BaseRepository;
+import hexlet.code.util.NamedRoutes;
 import io.javalin.Javalin;
 import io.javalin.rendering.template.JavalinJte;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +46,14 @@ public class App {
         JavalinJte.init(createTemplateEngine());
 
 
-        app.get("/", context -> context.render("index.jte"));
+        //GET /
+        app.get(NamedRoutes.rootPath(), MainController::index);
+        //GET /urls
+        app.get(NamedRoutes.urlsPath(), UrlController::index);
+        //GET /urls/{id}
+        app.get(NamedRoutes.urlPath("{id}"), UrlController::show);
+        //POST /urls
+        app.post(NamedRoutes.urlsPath(), UrlController::create);
 
         return app;
     }
