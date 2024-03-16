@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
-import java.util.Base64;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -29,7 +28,8 @@ public class App {
     }
     public static Javalin getApp() throws IOException, SQLException {
         var hikariConfig = new HikariConfig();
-        hikariConfig.setJdbcUrl(System.getenv().getOrDefault("JDBC_DATABASE_URL", "jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;"));
+        hikariConfig.setJdbcUrl(System.getenv()
+                .getOrDefault("JDBC_DATABASE_URL", "jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;"));
         var dataSource = new HikariDataSource(hikariConfig);
         var sql = readResourceFile("schema.sql");
 

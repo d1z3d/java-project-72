@@ -3,9 +3,11 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
     application
+    jacoco
     id("java")
     id("io.freefair.lombok") version "8.3"
     id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("checkstyle")
 }
 
 application {
@@ -20,7 +22,6 @@ repositories {
 }
 
 dependencies {
-    //подключить Postgres
     implementation("com.h2database:h2:2.2.222")
     implementation("org.postgresql:postgresql:42.1.4")
     implementation("com.zaxxer:HikariCP:5.0.1")
@@ -37,6 +38,10 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
 
+tasks.compileJava {
+    options.release = 20
+}
+
 tasks.test {
     useJUnitPlatform()
     // https://technology.lastminute.com/junit5-kotlin-and-gradle-dsl/
@@ -47,4 +52,17 @@ tasks.test {
         // showCauses = true
         showStandardStreams = true
     }
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+jacoco {
+    toolVersion = "0.8.9"
+    reportsDirectory
+}
+
+tasks.jacocoTestReport {
+    reports {
+        xml.required = true
+    }
+
 }
