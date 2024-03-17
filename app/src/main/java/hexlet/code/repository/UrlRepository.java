@@ -80,9 +80,7 @@ public class UrlRepository extends BaseRepository {
 
     public static List<Url> getLeads() throws SQLException {
         List<Url> result = new ArrayList<>();
-        /*var sql = "SELECT t.id as id, u.name as name, t.status_code as status_code, max(t.created_at) as last_time_checked FROM urls_checks as t LEFT JOIN urls as u ON u.id=t.url_id "
-                + "GROUP BY id, name, status_code";*/
-        var sql = "SELECT u.id, u.name, t.status_code, max(t.created_at) as last_time_checked FROM urls as u LEFT JOIN urls_checks as t ON u.id=t.url_id GROUP BY u.id, u.name, t.status_code";
+        var sql = "SELECT u.id, u.name, t.status_code, max(t.created_at) as last_time_checked FROM urls as u LEFT JOIN urls_checks as t ON u.id=t.url_id GROUP BY u.id, u.name, t.status_code ORDER BY u.id";
         try (var connection = dataSource.getConnection();
              var prepareStatement = connection.prepareStatement(sql)) {
             var resultSet = prepareStatement.executeQuery();
