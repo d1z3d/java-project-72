@@ -1,4 +1,7 @@
 @import hexlet.code.dto.url.UrlPage
+@import hexlet.code.model.UrlCheck
+@import hexlet.code.util.HtmlUtils
+@import hexlet.code.util.NamedRoutes
 @param UrlPage page
 
 @template.layout.page(
@@ -18,9 +21,35 @@ content = @`
                 </tr>
                 <tr>
                     <td>Дата создания</td>
-                    <td>${page.getUrl().getCreatedAt().toString()}</td>
+                    <td>${HtmlUtils.getTimestampFormatted(page.getUrl().getCreatedAt())}</td>
                 </tr>
             </tbody>
+        </table>
+        <h2>Проверки</h2>
+        <form method="post" action="${NamedRoutes.urlCreateCheckPath(page.getUrl().getId())}">
+            <button type="submit" class="btn btn-primary">Запустить проверку</button>
+        </form>
+        <table class="table table-bordered table-hover mt-3">
+            <thead>
+                <th class="col-1">ID</th>
+                <th class="col-1">Код ответа</th>
+                <th>title</th>
+                <th>h1</th>
+                <th>description</th>
+                <th class="col-2">Дата проверки</th>
+            </thead>
+            @if(!page.getUrlChecks().isEmpty())
+                @for(UrlCheck urlCheck : page.getUrlChecks())
+                    <tr>
+                        <td>${urlCheck.getId()}</td>
+                        <td>${urlCheck.getStatusCode()}</td>
+                        <td>${urlCheck.getTitle()}</td>
+                        <td>${urlCheck.getH1()}</td>
+                        <td>${urlCheck.getDescription()}</td>
+                        <td>${HtmlUtils.getTimestampFormatted(urlCheck.getCreatedAt())}</td>
+                    </tr>
+                @endfor
+            @endif
         </table>
     </div>
 `)

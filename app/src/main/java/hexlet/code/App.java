@@ -55,6 +55,8 @@ public class App {
         app.get(NamedRoutes.urlPath("{id}"), UrlController::show);
         //POST /urls
         app.post(NamedRoutes.urlsPath(), UrlController::create);
+        //POST /urls/{id}/checks
+        app.post(NamedRoutes.urlCreateCheckPath("{id}"), UrlController::createCheck);
 
         return app;
     }

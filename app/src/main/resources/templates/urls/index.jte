@@ -1,4 +1,5 @@
 @import hexlet.code.dto.url.UrlsPage
+@import hexlet.code.util.HtmlUtils
 @param UrlsPage page
 
 @template.layout.page(
@@ -21,8 +22,8 @@ content = @`
                     <tr>
                         <td>${url.getId()}</td>
                         <td><a href="/urls/${url.getId()}">${url.getName()}</a></td>
-                        <td></td>
-                        <td></td>
+                        <td>${url.getLastTimeCheck() != null ? HtmlUtils.getTimestampFormatted(url.getLastTimeCheck()) : ""}</td>
+                        <td>${!url.getStatusCode().equals(0) ? String.valueOf(url.getStatusCode()) : ""}</td>
                     </tr>
                 @endfor
                 </tbody>

@@ -14,9 +14,17 @@ public class Url {
     @ToString.Include
     private String name;
     private Timestamp createdAt;
+    private Integer statusCode;
+    private Timestamp lastTimeCheck;
 
     public Url(String name, Timestamp createdAt) {
         this.name = name;
         this.createdAt = createdAt;
+    }
+
+    public Url(String name, Integer statusCode, Timestamp lastTimeCheck) {
+        this.name = name;
+        this.statusCode = statusCode;
+        this.lastTimeCheck = lastTimeCheck;
     }
 }
