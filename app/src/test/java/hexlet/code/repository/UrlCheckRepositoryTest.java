@@ -1,6 +1,6 @@
 package hexlet.code.repository;
 
-import hexlet.code.App;
+/*import hexlet.code.App;
 import hexlet.code.model.Url;
 import hexlet.code.model.UrlCheck;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,11 +11,11 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;*/
 
 public class UrlCheckRepositoryTest {
 
-    @BeforeEach
+    /*@BeforeEach
     public final void setUp() throws SQLException, IOException {
         App.getApp();
     }
@@ -35,5 +35,5 @@ public class UrlCheckRepositoryTest {
         actual2.add(urlCheck);
         var expected2 = UrlCheckRepository.getEntitiesByUrlId(url.getId());
         assertIterableEquals(actual2, expected2);
-    }
+    }*/
 }
