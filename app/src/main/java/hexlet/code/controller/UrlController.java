@@ -1,7 +1,6 @@
 package hexlet.code.controller;
 
 import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import hexlet.code.dto.url.UrlPage;
@@ -10,21 +9,19 @@ import hexlet.code.model.Url;
 import hexlet.code.model.UrlCheck;
 import hexlet.code.repository.UrlCheckRepository;
 import hexlet.code.repository.UrlRepository;
-import hexlet.code.util.HtmlUtils;
 import hexlet.code.util.NamedRoutes;
 import io.javalin.http.Context;
 import io.javalin.http.NotFoundResponse;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class UrlController {
     public static void index(Context context) throws SQLException {
@@ -39,7 +36,7 @@ public class UrlController {
         var urlParam = context.formParam("url");
         URL url = null;
         try {
-            url = new URL(Objects.requireNonNull(urlParam).trim());
+            url = new URI(Objects.requireNonNull(urlParam).trim()).toURL();
             String uri = url.getProtocol() + "://" + url.getAuthority();
             var urlDb = UrlRepository.findByName(uri);
             if (urlDb.isEmpty()) {
@@ -70,22 +67,36 @@ public class UrlController {
         context.render("urls/show.jte", Collections.singletonMap("page", page));
     }
 
-    public static void createCheck(Context context) throws SQLException, UnirestException, UnsupportedEncodingException {
+    public static void createCheck(Context context) throws SQLException, UnirestException {
         var idParam = context.pathParamAsClass("id", Long.class).get();
         var url = UrlRepository.findById(idParam)
                 .orElseThrow(() -> new NotFoundResponse("Not found"));
         HttpResponse<String> response = Unirest.get(url.getName())
-                .header("Content-Type", "text/html; charset=utf-8")
                 .asString();
 
-        String body = response.getBody();
+        Document document = Jsoup.parse(response.getBody());
+        String title = document.title();
+        String h1 = getValueByTag("h1", document);
+        String description = getDescription(document);
 
-        String title = new String(HtmlUtils.getValueOfNodeByTag("title", body).getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
-        String h1 = HtmlUtils.getValueOfNodeByTag("h1", body);
-        String description = HtmlUtils.getValueOfNodeByTag("description", body);
-
-        UrlCheck urlCheck = new UrlCheck(response.getCode(), title, h1, description, url.getId(), new Timestamp(System.currentTimeMillis()));
+        UrlCheck urlCheck = new UrlCheck(response.getCode(), title, h1,
+                description, url.getId(), new Timestamp(System.currentTimeMillis()));
         UrlCheckRepository.save(urlCheck);
         context.redirect(NamedRoutes.urlPath(url.getId()));
+    }
+
+    private static String getValueByTag(String tag, Document document) {
+        Element element = document.selectFirst(tag);
+        return element != null ? element.text() : "";
+    }
+    private static String getDescription(Document document) {
+        var elements = document.getElementsByTag("meta");
+        String result = "";
+        for (Element element : elements) {
+            if (element.attr("name").equals("description")) {
+                result = element.attr("content");
+            }
+        }
+        return result;
     }
 }

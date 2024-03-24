@@ -80,7 +80,10 @@ public class UrlRepository extends BaseRepository {
 
     public static List<Url> getLeads() throws SQLException {
         List<Url> result = new ArrayList<>();
-        var sql = "SELECT u.id, u.name, t.status_code, max(t.created_at) as last_time_checked FROM urls as u LEFT JOIN urls_checks as t ON u.id=t.url_id GROUP BY u.id, u.name, t.status_code ORDER BY u.id";
+        var sql = "SELECT u.id, u.name, t.status_code, u.created_at, max(t.created_at) as last_time_checked "
+                + "FROM urls as u "
+                + "LEFT JOIN urls_checks as t ON u.id=t.url_id "
+                + "GROUP BY u.id, u.name, u.created_at, t.status_code ORDER BY u.id";
         try (var connection = dataSource.getConnection();
              var prepareStatement = connection.prepareStatement(sql)) {
             var resultSet = prepareStatement.executeQuery();
@@ -88,8 +91,9 @@ public class UrlRepository extends BaseRepository {
                 var id = resultSet.getLong("id");
                 var name = resultSet.getString("name");
                 var statusCode = resultSet.getInt("status_code");
+                var createdAt = resultSet.getTimestamp("created_at");
                 var lastTimeChecked = resultSet.getTimestamp("last_time_checked");
-                var url = new Url(name, statusCode, lastTimeChecked);
+                var url = new Url(name, createdAt, statusCode, lastTimeChecked);
                 url.setId(id);
                 result.add(url);
             }

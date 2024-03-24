@@ -1,6 +1,5 @@
 package hexlet.code.repository;
 
-import hexlet.code.model.Url;
 import hexlet.code.model.UrlCheck;
 
 import java.sql.SQLException;
@@ -10,7 +9,8 @@ import java.util.List;
 
 public class UrlCheckRepository extends BaseRepository {
     public static void save(UrlCheck urlCheck) throws SQLException {
-        var sql = "INSERT INTO urls_checks (status_code, title, h1, description, url_id, created_at) VALUES (?, ?, ?, ?, ?, ?)";
+        var sql = "INSERT INTO urls_checks (status_code, title, h1, description, url_id, created_at) "
+                + "VALUES (?, ?, ?, ?, ?, ?)";
         try (var connection = dataSource.getConnection();
              var prepareStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             prepareStatement.setInt(1, urlCheck.getStatusCode());
@@ -22,7 +22,7 @@ public class UrlCheckRepository extends BaseRepository {
             prepareStatement.executeUpdate();
             var generatedKey = prepareStatement.getGeneratedKeys();
             if (generatedKey.next()) {
-               urlCheck.setId(generatedKey.getLong(1));
+                urlCheck.setId(generatedKey.getLong(1));
             } else {
                 throw new SQLException("При создании проверки сайта произошла ошибка в БД");
             }
@@ -33,7 +33,7 @@ public class UrlCheckRepository extends BaseRepository {
         List<UrlCheck> result = new ArrayList<>();
         var sql = "SELECT c.* FROM urls as u JOIN urls_checks as c ON c.url_id=u.id WHERE u.id=? ORDER BY c.id";
         try (var connection = dataSource.getConnection();
-        var prepareStatement = connection.prepareStatement(sql)) {
+             var prepareStatement = connection.prepareStatement(sql)) {
             prepareStatement.setLong(1, urlId);
             var resultSet = prepareStatement.executeQuery();
             while (resultSet.next()) {
