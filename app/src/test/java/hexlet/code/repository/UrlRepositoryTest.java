@@ -1,11 +1,14 @@
 package hexlet.code.repository;
 
-/*import hexlet.code.App;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import hexlet.code.TestUtils;
 import hexlet.code.model.Url;
+import io.javalin.Javalin;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -13,16 +16,33 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;*/
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
 public class UrlRepositoryTest {
 
-    /*private Url url;
+    private Javalin app;
+    private Url url;
 
     @BeforeEach
-    public final void setUp() throws SQLException, IOException {
+    public final void setUp() throws Exception {
         url = new Url("https://example.com", new Timestamp(System.currentTimeMillis()));
-        App.getApp();
+        var hikariConfig = new HikariConfig();
+        hikariConfig.setJdbcUrl(System.getenv()
+                .getOrDefault("JDBC_DATABASE_URL", "jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;"));
+        var dataSource = new HikariDataSource(hikariConfig);
+        var sql = TestUtils.getDataFromFile(TestUtils.getFixturePath("sql", "schema.sql"));
+
+        //log.info(sql);
+        try (var connection = dataSource.getConnection();
+             var preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.execute();
+        }
+        BaseRepository.dataSource = dataSource;
+    }
+
+    @AfterEach
+    public final void turnDown() {
+        BaseRepository.dataSource.close();
     }
 
     @Test
@@ -37,17 +57,59 @@ public class UrlRepositoryTest {
         assertThat(actual1).isEqualTo(expected2);
         assertIterableEquals(actual2, expected3);
         assertIterableEquals(actual2, expected4);
+    }
+
+    @Test
+    public void findByIdTest() throws SQLException {
+        Optional<Url> actual1 = Optional.empty();
+        Optional<Url> expected1 = UrlRepository.findById(1L);
+        assertThat(actual1).isEqualTo(expected1);
 
         UrlRepository.save(url);
-        var actual3 = List.of(url);
-        var expected5 = UrlRepository.findById(url.getId()).get();
-        var expected6 = UrlRepository.findByName(url.getName()).get();
-        var expected7 = UrlRepository.getEntities();
-        var expected8 = UrlRepository.getLeads();
-        assertThat(url).isEqualTo(expected5);
-        assertThat(url).isEqualTo(expected6);
-        assertIterableEquals(actual3, expected7);
+        Url expected2 = UrlRepository.findById(url.getId()).get();
+        assertThat(url).isEqualTo(expected2);
+    }
+
+    @Test
+    public void saveTest() throws SQLException {
+        UrlRepository.save(url);
+        assertThat(url.getId()).isEqualTo(1);
+    }
+
+    @Test
+    public void findByNameTest() throws SQLException {
+        Optional<Url> actual1 = Optional.empty();
+        Optional<Url> expected1 = UrlRepository.findByName(url.getName());
+        assertThat(actual1).isEqualTo(expected1);
+
+        UrlRepository.save(url);
+        Url expected2 = UrlRepository.findByName(url.getName()).get();
+        assertThat(url).isEqualTo(expected2);
+    }
+
+    @Test
+    public void getEntitiesTest() throws SQLException {
+        List<Url> actual = new ArrayList<>();
+        List<Url> expected1 = UrlRepository.getEntities();
+        assertIterableEquals(actual, expected1);
+
+        UrlRepository.save(url);
+        actual.add(url);
+        List<Url> expected2 = UrlRepository.getEntities();
+        assertIterableEquals(actual, expected2);
+    }
+
+    @Test
+    public void getLeadsTest() throws SQLException {
+        List<Url> actual = new ArrayList<>();
+        List<Url> expected1 = UrlRepository.getLeads();
+        assertIterableEquals(actual, expected1);
+
+        UrlRepository.save(url);
         url.setStatusCode(0);
-        assertIterableEquals(actual3, expected8);
-    }*/
+        actual.add(url);
+        List<Url> expected2 = UrlRepository.getLeads();
+
+        assertIterableEquals(expected2, actual);
+    }
 }
