@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
 public class UrlRepositoryTest {
 
-    private Javalin app;
     private Url url;
 
     @BeforeEach

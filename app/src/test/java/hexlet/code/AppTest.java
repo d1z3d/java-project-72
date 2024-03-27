@@ -1,5 +1,7 @@
 package hexlet.code;
 
+import hexlet.code.controller.MainController;
+import hexlet.code.controller.UrlController;
 import hexlet.code.model.Url;
 import hexlet.code.repository.UrlCheckRepository;
 import hexlet.code.repository.UrlRepository;
@@ -9,25 +11,24 @@ import io.javalin.http.HttpStatus;
 import io.javalin.testtools.JavalinTest;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class AppTest {
-    private static final Integer PORT = 3543;
-    private static final String NAME = "http://localhost:" + PORT;
-    private static String html;
-    private static Javalin app;
-    private static MockWebServer mockWebServer;
+    private String name;
+    private String html;
+    private Url url;
+    private Javalin app;
+    private MockWebServer mockWebServer;
 
 
-    @BeforeAll
-    public static void setUp() throws Exception {
+    @BeforeEach
+    public final void setUp() throws Exception {
         html = TestUtils.getDataFromFile(TestUtils.getFixturePath("html", "example.html"));
         app = App.getApp();
         mockWebServer = new MockWebServer();
@@ -35,26 +36,48 @@ public class AppTest {
                 .setResponseCode(HttpStatus.OK.getCode())
                 .setBody(html);
         mockWebServer.enqueue(response);
-        mockWebServer.start(PORT);
+        mockWebServer.start();
+        name = String.format("http://%s:%s", mockWebServer.getHostName(), mockWebServer.getPort());
+        url = new Url(name, new Timestamp(System.currentTimeMillis()));
     }
 
-    @AfterAll
-    public static void turnDown() throws IOException {
+    @AfterEach
+    public final void turnDown() throws IOException {
         app.stop();
         mockWebServer.shutdown();
     }
 
     @Test
-    public void test() throws Exception {
+    public void getRootTest() {
         JavalinTest.test(app, (server, client) -> {
-            Url url = new Url(NAME, new Timestamp(System.currentTimeMillis()));
-            UrlRepository.save(url);
-            var response1 = client.post(NamedRoutes.urlCreateCheckPath(url.getId()));
-            var checks = UrlCheckRepository.getEntitiesByUrlId(url.getId());
-            assertThat(200).isEqualTo(checks.get(0).getStatusCode());
-            assertThat("test").isEqualTo(checks.get(0).getDescription());
+            var response = client.get(NamedRoutes.rootPath());
+            assertThat(response.code()).isEqualTo(200);
+            assertThat(response.body().string()).contains("Анализатор страниц");
+            response.close();
         });
-        mockWebServer.shutdown();
-        app.stop();
+    }
+
+    @Test
+    public void createUrlTest() {
+        JavalinTest.test(app, (server, client) -> {
+            var urlParam = "url=" + name;
+            client.post(NamedRoutes.urlsPath(), urlParam);
+            var response = client.get(NamedRoutes.urlsPath());
+            assertThat(response.code()).isEqualTo(200);
+            assertThat(response.body().string()).contains(name);
+            response.close();
+        });
+    }
+
+    @Test
+    public void createUrlCheckTest() throws SQLException {
+        UrlRepository.save(url);
+        JavalinTest.test(app, (server, client) -> {
+            client.post(NamedRoutes.urlCreateCheckPath(url.getId()));
+            var response = client.get(NamedRoutes.urlPath(url.getId()));
+            assertThat(response.code()).isEqualTo(200);
+            assertThat(response.body().string()).contains("test");
+            response.close();
+        });
     }
 }

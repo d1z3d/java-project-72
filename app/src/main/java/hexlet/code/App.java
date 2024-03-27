@@ -29,7 +29,7 @@ public class App {
     public static Javalin getApp() throws IOException, SQLException {
         var hikariConfig = new HikariConfig();
         hikariConfig.setJdbcUrl(System.getenv()
-                .getOrDefault("JDBC_DATABASE_URL", "jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;"));
+                .getOrDefault("JDBC_DATABASE_URL", "jdbc:h2:mem:project;DEFAULT_LOCK_TIMEOUT=10000;LOCK_MODE=0"));
         var dataSource = new HikariDataSource(hikariConfig);
         var sql = readResourceFile("schema.sql");
 
@@ -41,10 +41,8 @@ public class App {
         BaseRepository.dataSource = dataSource;
 
         var app = Javalin.create(config -> {
-            config.plugins.enableDevLogging();
+            config.fileRenderer(new JavalinJte(createTemplateEngine()));
         });
-
-        JavalinJte.init(createTemplateEngine());
 
 
         //GET /
