@@ -50,9 +50,8 @@ public class AppTest {
     public void getRootTest() {
         JavalinTest.test(app, (server, client) -> {
             var response = client.get(NamedRoutes.rootPath());
-            assertThat(response.code()).isEqualTo(200);
+            assertThat(response.code()).isEqualTo(HttpStatus.OK.getCode());
             assertThat(response.body().string()).contains("Анализатор страниц");
-            response.close();
         });
     }
 
@@ -62,9 +61,11 @@ public class AppTest {
             var urlParam = "url=" + name;
             client.post(NamedRoutes.urlsPath(), urlParam);
             var response = client.get(NamedRoutes.urlsPath());
-            assertThat(response.code()).isEqualTo(200);
+            assertThat(response.code()).isEqualTo(HttpStatus.OK.getCode());
             assertThat(response.body().string()).contains(name);
-            response.close();
+
+            response = client.post(NamedRoutes.urlsPath(), urlParam);
+            assertThat(response.code()).isEqualTo(HttpStatus.OK.getCode());
         });
     }
 
@@ -76,7 +77,6 @@ public class AppTest {
             var response = client.get(NamedRoutes.urlPath(url.getId()));
             assertThat(response.code()).isEqualTo(200);
             assertThat(response.body().string()).contains("test");
-            response.close();
         });
     }
 }

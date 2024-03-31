@@ -25,27 +25,4 @@ public class UrlCheck {
         this.urlId = urlId;
         this.createdAt = createdAt;
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        UrlCheck urlCheck = (UrlCheck) o;
-        return Objects.equals(id, urlCheck.id)
-                && Objects.equals(statusCode, urlCheck.statusCode)
-                && Objects.equals(title, urlCheck.title)
-                && Objects.equals(h1, urlCheck.h1)
-                && Objects.equals(description, urlCheck.description)
-                && Objects.equals(urlId, urlCheck.urlId)
-                && Objects.equals(createdAt, urlCheck.createdAt);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, statusCode, title, h1, description, urlId, createdAt);
-    }
 }

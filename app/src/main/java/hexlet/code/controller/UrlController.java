@@ -11,6 +11,7 @@ import hexlet.code.repository.UrlCheckRepository;
 import hexlet.code.repository.UrlRepository;
 import hexlet.code.util.NamedRoutes;
 import io.javalin.http.Context;
+import io.javalin.http.HttpStatus;
 import io.javalin.http.NotFoundResponse;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

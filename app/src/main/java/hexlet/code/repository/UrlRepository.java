@@ -60,24 +60,6 @@ public class UrlRepository extends BaseRepository {
         }
     }
 
-/*    public static List<Url> getEntities() throws SQLException {
-        List<Url> result = new ArrayList<>();
-        var sql = "SELECT * FROM urls";
-        try (var connection = dataSource.getConnection();
-             var prepareStatement = connection.prepareStatement(sql)) {
-            var resultSet = prepareStatement.executeQuery();
-            while (resultSet.next()) {
-                var id = resultSet.getLong("id");
-                var name = resultSet.getString("name");
-                var timestamp = resultSet.getTimestamp("created_at");
-                var url = new Url(name, timestamp);
-                url.setId(id);
-                result.add(url);
-            }
-        }
-        return result;
-    }*/
-
     public static List<Url> getLeads() throws SQLException {
         List<Url> result = new ArrayList<>();
         var sql = "SELECT u.id, u.name, t.status_code, u.created_at, max(t.created_at) as last_time_checked "
