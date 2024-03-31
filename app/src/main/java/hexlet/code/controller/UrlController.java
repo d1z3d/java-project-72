@@ -49,11 +49,13 @@ public class UrlController {
             } else {
                 //В БД уже есть данные, нужно flash отдать
                 context.sessionAttribute("flash", "Страница уже существует");
-                context.redirect(NamedRoutes.rootPath());
+                context.contentType("text/html; charset=utf-8");
+                context.redirect(NamedRoutes.rootPath(), HttpStatus.BAD_REQUEST);
             }
         } catch (Exception e) {
             context.sessionAttribute("flash", "Некорректный URL");
-            context.redirect(NamedRoutes.rootPath());
+            context.contentType("text/html; charset=utf-8");
+            context.redirect(NamedRoutes.rootPath(), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -83,6 +85,7 @@ public class UrlController {
         UrlCheck urlCheck = new UrlCheck(response.getCode(), title, h1,
                 description, url.getId(), new Timestamp(System.currentTimeMillis()));
         UrlCheckRepository.save(urlCheck);
+        context.contentType("text/html; charset=utf-8");
         context.redirect(NamedRoutes.urlPath(url.getId()));
     }
 

@@ -52,6 +52,7 @@ public class AppTest {
             var response = client.get(NamedRoutes.rootPath());
             assertThat(response.code()).isEqualTo(HttpStatus.OK.getCode());
             assertThat(response.body().string()).contains("Анализатор страниц");
+            response.close();
         });
     }
 
@@ -65,7 +66,11 @@ public class AppTest {
             assertThat(response.body().string()).contains(name);
 
             response = client.post(NamedRoutes.urlsPath(), urlParam);
-            assertThat(response.code()).isEqualTo(HttpStatus.OK.getCode());
+            assertThat(response.code()).isEqualTo(HttpStatus.BAD_REQUEST.getCode());
+
+            response = client.post(NamedRoutes.urlsPath(), "test");
+            assertThat(response.code()).isEqualTo(HttpStatus.BAD_REQUEST.getCode());
+            response.close();
         });
     }
 
@@ -77,6 +82,7 @@ public class AppTest {
             var response = client.get(NamedRoutes.urlPath(url.getId()));
             assertThat(response.code()).isEqualTo(200);
             assertThat(response.body().string()).contains("test");
+            response.close();
         });
     }
 }
