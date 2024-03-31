@@ -46,5 +46,13 @@
     @endif
     ${content}
 </main>
+<footer class="footer border-top py-3 mt-5 bg-light">
+    <div class="container-xl">
+        <div class="text-center">
+            Created by
+            <a href="https://github.com/d1z3d" target="_blank">Borychev Andrey</a>
+        </div>
+    </div>
+</footer>
 </body>
 </html>
