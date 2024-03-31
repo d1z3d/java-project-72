@@ -60,7 +60,7 @@ public class UrlRepository extends BaseRepository {
         }
     }
 
-    public static List<Url> getEntities() throws SQLException {
+/*    public static List<Url> getEntities() throws SQLException {
         List<Url> result = new ArrayList<>();
         var sql = "SELECT * FROM urls";
         try (var connection = dataSource.getConnection();
@@ -76,7 +76,7 @@ public class UrlRepository extends BaseRepository {
             }
         }
         return result;
-    }
+    }*/
 
     public static List<Url> getLeads() throws SQLException {
         List<Url> result = new ArrayList<>();
