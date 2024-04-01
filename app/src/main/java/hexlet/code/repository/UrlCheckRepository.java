@@ -9,7 +9,7 @@ import java.util.List;
 
 public class UrlCheckRepository extends BaseRepository {
     public static void save(UrlCheck urlCheck) throws SQLException {
-        var sql = "INSERT INTO urls_checks (status_code, title, h1, description, url_id, created_at) "
+        var sql = "INSERT INTO url_checks (status_code, title, h1, description, url_id, created_at) "
                 + "VALUES (?, ?, ?, ?, ?, ?)";
         try (var connection = dataSource.getConnection();
              var prepareStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -31,7 +31,7 @@ public class UrlCheckRepository extends BaseRepository {
 
     public static List<UrlCheck> getEntitiesByUrlId(Long urlId) throws SQLException {
         List<UrlCheck> result = new ArrayList<>();
-        var sql = "SELECT c.* FROM urls as u JOIN urls_checks as c ON c.url_id=u.id WHERE u.id=? ORDER BY c.id";
+        var sql = "SELECT c.* FROM urls as u JOIN url_checks as c ON c.url_id=u.id WHERE u.id=? ORDER BY c.id";
         try (var connection = dataSource.getConnection();
              var prepareStatement = connection.prepareStatement(sql)) {
             prepareStatement.setLong(1, urlId);

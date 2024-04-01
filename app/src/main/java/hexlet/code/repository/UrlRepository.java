@@ -64,7 +64,7 @@ public class UrlRepository extends BaseRepository {
         List<Url> result = new ArrayList<>();
         var sql = "SELECT u.id, u.name, t.status_code, u.created_at, max(t.created_at) as last_time_checked "
                 + "FROM urls as u "
-                + "LEFT JOIN urls_checks as t ON u.id=t.url_id "
+                + "LEFT JOIN url_checks as t ON u.id=t.url_id "
                 + "GROUP BY u.id, u.name, u.created_at, t.status_code ORDER BY u.id";
         try (var connection = dataSource.getConnection();
              var prepareStatement = connection.prepareStatement(sql)) {
