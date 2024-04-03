@@ -22,7 +22,7 @@
     <div class="container-fluid">
         <a class="navbar-brand link-light" href="${NamedRoutes.rootPath()}">Анализатор страниц</a>
         <button class="navbar-toggler collapsed" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarNav" aria-controls="navbarNavq" aria-expanded="false"
+                data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
                 aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>

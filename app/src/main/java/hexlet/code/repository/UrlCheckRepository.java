@@ -2,12 +2,13 @@ package hexlet.code.repository;
 
 import hexlet.code.model.UrlCheck;
 
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.sql.SQLException;
+import java.sql.Statement;
+
 
 public class UrlCheckRepository extends BaseRepository {
     public static void save(UrlCheck urlCheck) throws SQLException {
@@ -66,11 +67,11 @@ public class UrlCheckRepository extends BaseRepository {
                 var title = resultSet.getString("title");
                 var h1 = resultSet.getString("h1");
                 var description = resultSet.getString("description");
-                var url_id = resultSet.getLong("url_id");
+                var urlId = resultSet.getLong("url_id");
                 var createdAt = resultSet.getTimestamp("created_at");
-                var urlCheck = new UrlCheck(statusCode, title, h1, description, url_id, createdAt);
+                var urlCheck = new UrlCheck(statusCode, title, h1, description, urlId, createdAt);
                 urlCheck.setId(id);
-                result.put(url_id, urlCheck);
+                result.put(urlId, urlCheck);
             }
         }
         return result;
