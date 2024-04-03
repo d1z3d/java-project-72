@@ -11,12 +11,17 @@
 * Фронт: JTE, Bootstrap
 * HTTP-клиент: Unirest
 * Парсер: Jsoup
-* ОРМ: Ebean
+* ОРМ: Отсутствует.
+ * Подключение к БД: Hikari
+ * Создание БД: DDL
+ * Получение данных: DML
 * БД:
   * DEV: H2
   * PROD: PostgreSQL
 * Тесты: JUnit 5, MockWebServer
 * Тест репортер: Jacoco
+* Деплой: PaaS на [https://render.com](render.com)
+
 Также в проекте используется Docker при деплое на PRODUCTION.
 
 ### Сборка проекта
