@@ -1,12 +1,12 @@
 package hexlet.code.repository;
 
 import hexlet.code.model.Url;
+import hexlet.code.model.UrlCheck;
 
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.sql.Timestamp;
+import java.util.*;
 
 public class UrlRepository extends BaseRepository {
     public static void save(Url url) throws SQLException {
@@ -14,7 +14,7 @@ public class UrlRepository extends BaseRepository {
         try (var connection = dataSource.getConnection();
              var prepareStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             prepareStatement.setString(1, url.getName());
-            prepareStatement.setTimestamp(2, url.getCreatedAt());
+            prepareStatement.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
             prepareStatement.executeUpdate();
             var generatedKey = prepareStatement.getGeneratedKeys();
             if (generatedKey.next()) {
@@ -22,6 +22,24 @@ public class UrlRepository extends BaseRepository {
             } else {
                 throw new SQLException("При создании URL произошла ошибка в БД");
             }
+        }
+    }
+
+    public static List<Url> getEntities() throws SQLException {
+        List<Url> result = new ArrayList<>();
+        var sql = "SELECT * FROM urls";
+        try (var connection = dataSource.getConnection();
+             var prepareStatement = connection.prepareStatement(sql)) {
+            var resultSet = prepareStatement.executeQuery();
+            while (resultSet.next()) {
+                var id = resultSet.getLong("id");
+                var name = resultSet.getString("name");
+                var createdAt = resultSet.getTimestamp("created_at");
+                var url = new Url(name, createdAt);
+                url.setId(id);
+                result.add(url);
+            }
+            return result;
         }
     }
 
@@ -58,28 +76,5 @@ public class UrlRepository extends BaseRepository {
             }
             return Optional.empty();
         }
-    }
-
-    public static List<Url> getLeads() throws SQLException {
-        List<Url> result = new ArrayList<>();
-        var sql = "SELECT u.id, u.name, t.status_code, u.created_at, max(t.created_at) as last_time_checked "
-                + "FROM urls as u "
-                + "LEFT JOIN url_checks as t ON u.id=t.url_id "
-                + "GROUP BY u.id, u.name, u.created_at, t.status_code ORDER BY u.id";
-        try (var connection = dataSource.getConnection();
-             var prepareStatement = connection.prepareStatement(sql)) {
-            var resultSet = prepareStatement.executeQuery();
-            while (resultSet.next()) {
-                var id = resultSet.getLong("id");
-                var name = resultSet.getString("name");
-                var statusCode = resultSet.getInt("status_code");
-                var createdAt = resultSet.getTimestamp("created_at");
-                var lastTimeChecked = resultSet.getTimestamp("last_time_checked");
-                var url = new Url(name, createdAt, statusCode, lastTimeChecked);
-                url.setId(id);
-                result.add(url);
-            }
-        }
-        return result;
     }
 }

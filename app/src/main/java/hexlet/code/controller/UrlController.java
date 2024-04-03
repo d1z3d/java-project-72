@@ -26,8 +26,9 @@ import java.util.Objects;
 
 public class UrlController {
     public static void index(Context context) throws SQLException {
-        var urls = UrlRepository.getLeads();
-        var page = new UrlsPage(urls);
+        var urls = UrlRepository.getEntities();
+        var urlChecks = UrlCheckRepository.getLastChecks();
+        var page = new UrlsPage(urls, urlChecks);
         page.setFlash(context.consumeSessionAttribute("flash"));
         context.contentType("text/html; charset=utf-8");
         context.render("urls/index.jte", Collections.singletonMap("page", page));
@@ -42,7 +43,7 @@ public class UrlController {
             var urlDb = UrlRepository.findByName(uri);
             if (urlDb.isEmpty()) {
                 //Можно создавать в бд
-                var entity = new Url(uri, new Timestamp(System.currentTimeMillis()));
+                var entity = new Url(uri);
                 UrlRepository.save(entity);
                 context.sessionAttribute("flash", "Страница успешно создана");
                 context.redirect(NamedRoutes.urlsPath());
@@ -66,6 +67,7 @@ public class UrlController {
                 .orElseThrow(() -> new NotFoundResponse("Страница с ID=" + idParam + " не существует"));
         var urlChecks = UrlCheckRepository.getEntitiesByUrlId(url.getId());
         var page = new UrlPage(url, urlChecks);
+        page.setFlash(context.consumeSessionAttribute("flash"));
         context.contentType("text/html; charset=utf-8");
         context.render("urls/show.jte", Collections.singletonMap("page", page));
     }
@@ -74,19 +76,25 @@ public class UrlController {
         var idParam = context.pathParamAsClass("id", Long.class).get();
         var url = UrlRepository.findById(idParam)
                 .orElseThrow(() -> new NotFoundResponse("Not found"));
-        HttpResponse<String> response = Unirest.get(url.getName())
-                .asString();
+        HttpResponse<String> response = null;
+        try {
+            response = Unirest.get(url.getName())
+                    .asString();
+            Document document = Jsoup.parse(response.getBody());
+            String title = document.title();
+            String h1 = getValueByTag("h1", document);
+            String description = getDescription(document);
 
-        Document document = Jsoup.parse(response.getBody());
-        String title = document.title();
-        String h1 = getValueByTag("h1", document);
-        String description = getDescription(document);
-
-        UrlCheck urlCheck = new UrlCheck(response.getCode(), title, h1,
-                description, url.getId(), new Timestamp(System.currentTimeMillis()));
-        UrlCheckRepository.save(urlCheck);
-        context.contentType("text/html; charset=utf-8");
-        context.redirect(NamedRoutes.urlPath(url.getId()));
+            UrlCheck urlCheck = new UrlCheck(response.getCode(), title, h1,
+                    description, url.getId(), new Timestamp(System.currentTimeMillis()));
+            UrlCheckRepository.save(urlCheck);
+            context.contentType("text/html; charset=utf-8");
+            context.redirect(NamedRoutes.urlPath(url.getId()));
+        } catch (UnirestException e) {
+            context.sessionAttribute("flash", "Сервер недоступен или его не существует");
+            context.contentType("text/html; charset=utf-8");
+            context.redirect(NamedRoutes.urlPath(url.getId()));
+        }
     }
 
     private static String getValueByTag(String tag, Document document) {

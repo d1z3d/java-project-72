@@ -5,7 +5,9 @@ import hexlet.code.model.UrlCheck;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class UrlCheckRepository extends BaseRepository {
     public static void save(UrlCheck urlCheck) throws SQLException {
@@ -46,6 +48,29 @@ public class UrlCheckRepository extends BaseRepository {
                 UrlCheck urlCheck = new UrlCheck(statusCode, title, h1, description, urlId, createdAt);
                 urlCheck.setId(id);
                 result.add(urlCheck);
+            }
+        }
+        return result;
+    }
+    public static Map<Long, UrlCheck> getLastChecks() throws SQLException {
+        Map<Long, UrlCheck> result = new HashMap<>();
+        var sql = "SELECT DISTINCT ON (url_id) id, status_code, title, h1, description, url_id, created_at "
+                + "FROM url_checks "
+                + "ORDER BY url_id, id desc";
+        try (var connection = dataSource.getConnection();
+             var prepareStatement = connection.prepareStatement(sql)) {
+            var resultSet = prepareStatement.executeQuery();
+            while (resultSet.next()) {
+                var id = resultSet.getLong("id");
+                var statusCode = resultSet.getInt("status_code");
+                var title = resultSet.getString("title");
+                var h1 = resultSet.getString("h1");
+                var description = resultSet.getString("description");
+                var url_id = resultSet.getLong("url_id");
+                var createdAt = resultSet.getTimestamp("created_at");
+                var urlCheck = new UrlCheck(statusCode, title, h1, description, url_id, createdAt);
+                urlCheck.setId(id);
+                result.put(url_id, urlCheck);
             }
         }
         return result;

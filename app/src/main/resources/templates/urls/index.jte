@@ -1,6 +1,7 @@
 @import hexlet.code.dto.url.UrlsPage
 @import hexlet.code.util.HtmlUtils
 @param UrlsPage page
+!{var urlChecks = page.getLastChecks();}
 
 @template.layout.page(
 page = page,
@@ -12,7 +13,7 @@ content = @`
                 <thead>
                     <tr>
                         <th class="col-1">ID</th>
-                        <th>Имя</th>
+                        <th class="col-1">Имя</th>
                         <th class="col-2">Последняя проверка</th>
                         <th class="col-1">Код ответа</th>
                     </tr>
@@ -22,10 +23,33 @@ content = @`
                     <tr>
                         <td>${url.getId()}</td>
                         <td><a href="/urls/${url.getId()}">${url.getName()}</a></td>
+                        @if(!urlChecks.isEmpty())
+                            !{var urlCheck = urlChecks.get(url.getId());}
+                            @if(urlCheck != null)
+                                <td>${HtmlUtils.getTimestampFormatted(urlCheck.getCreatedAt())}</td>
+                                <td>
+                                    ${!urlCheck.getStatusCode().equals(0)
+                                        ? String.valueOf(urlCheck.getStatusCode())
+                                        : ""}
+                                </td>
+                            @else
+                                <td></td>
+                                <td></td>
+                            @endif
+                        @else
+                            <td></td>
+                            <td></td>
+                        @endif
+                    </tr>
+                @endfor
+                <%--@for(var url : page.getUrls())
+                    <tr>
+                        <td>${url.getId()}</td>
+                        <td><a href="/urls/${url.getId()}">${url.getName()}</a></td>
                         <td>${url.getLastTimeCheck() != null ? HtmlUtils.getTimestampFormatted(url.getLastTimeCheck()) : ""}</td>
                         <td>${!url.getStatusCode().equals(0) ? String.valueOf(url.getStatusCode()) : ""}</td>
                     </tr>
-                @endfor
+                @endfor--%>
                 </tbody>
             </table>
         </div>
