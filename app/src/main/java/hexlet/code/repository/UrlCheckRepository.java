@@ -2,6 +2,7 @@ package hexlet.code.repository;
 
 import hexlet.code.model.UrlCheck;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +22,7 @@ public class UrlCheckRepository extends BaseRepository {
             prepareStatement.setString(3, urlCheck.getH1());
             prepareStatement.setString(4, urlCheck.getDescription());
             prepareStatement.setLong(5, urlCheck.getUrlId());
-            prepareStatement.setTimestamp(6, urlCheck.getCreatedAt());
+            prepareStatement.setTimestamp(6, new Timestamp(System.currentTimeMillis()));
             prepareStatement.executeUpdate();
             var generatedKey = prepareStatement.getGeneratedKeys();
             if (generatedKey.next()) {
@@ -46,8 +47,9 @@ public class UrlCheckRepository extends BaseRepository {
                 var h1 = resultSet.getString("h1");
                 var description = resultSet.getString("description");
                 var createdAt = resultSet.getTimestamp("created_at");
-                UrlCheck urlCheck = new UrlCheck(statusCode, title, h1, description, urlId, createdAt);
+                UrlCheck urlCheck = new UrlCheck(statusCode, title, h1, description, urlId);
                 urlCheck.setId(id);
+                urlCheck.setCreatedAt(createdAt);
                 result.add(urlCheck);
             }
         }
@@ -69,8 +71,9 @@ public class UrlCheckRepository extends BaseRepository {
                 var description = resultSet.getString("description");
                 var urlId = resultSet.getLong("url_id");
                 var createdAt = resultSet.getTimestamp("created_at");
-                var urlCheck = new UrlCheck(statusCode, title, h1, description, urlId, createdAt);
+                var urlCheck = new UrlCheck(statusCode, title, h1, description, urlId);
                 urlCheck.setId(id);
+                urlCheck.setCreatedAt(createdAt);
                 result.put(urlId, urlCheck);
             }
         }

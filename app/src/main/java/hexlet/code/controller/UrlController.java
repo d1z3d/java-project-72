@@ -20,7 +20,6 @@ import org.jsoup.nodes.Element;
 import java.net.URI;
 import java.net.URL;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.Objects;
 
@@ -51,7 +50,7 @@ public class UrlController {
                 //В БД уже есть данные, нужно flash отдать
                 context.sessionAttribute("flash", "Страница уже существует");
                 context.contentType("text/html; charset=utf-8");
-                context.redirect(NamedRoutes.rootPath(), HttpStatus.BAD_REQUEST);
+                context.redirect(NamedRoutes.rootPath(), HttpStatus.CONFLICT);
             }
         } catch (Exception e) {
             context.sessionAttribute("flash", "Некорректный URL");
@@ -86,7 +85,7 @@ public class UrlController {
             String description = getDescription(document);
 
             UrlCheck urlCheck = new UrlCheck(response.getCode(), title, h1,
-                    description, url.getId(), new Timestamp(System.currentTimeMillis()));
+                    description, url.getId());
             UrlCheckRepository.save(urlCheck);
             context.contentType("text/html; charset=utf-8");
             context.redirect(NamedRoutes.urlPath(url.getId()));
