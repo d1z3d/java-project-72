@@ -39,26 +39,21 @@ public class AppTest {
                 "exampleWithoutH1.html"));
         app = App.getApp();
         mockWebServer = new MockWebServer();
-        MockResponse response1 = new MockResponse()
+        mockWebServer.enqueue(new MockResponse()
                 .setResponseCode(HttpStatus.OK.getCode())
-                .setBody(html1);
-        MockResponse response2 = new MockResponse()
+                .setBody(html1));
+        mockWebServer.enqueue(new MockResponse()
                 .setResponseCode(HttpStatus.OK.getCode())
-                .setBody(html2);
-        MockResponse response3 = new MockResponse()
+                .setBody(html2));
+        mockWebServer.enqueue(new MockResponse()
                 .setResponseCode(HttpStatus.OK.getCode())
-                .setBody(html3);
-        MockResponse response4 = new MockResponse()
+                .setBody(html3));
+        mockWebServer.enqueue(new MockResponse()
                 .setResponseCode(HttpStatus.OK.getCode())
-                .setBody(html4);
-        MockResponse response5 = new MockResponse()
+                .setBody(html4));
+        mockWebServer.enqueue(new MockResponse()
                 .setResponseCode(HttpStatus.OK.getCode())
-                .setBody(html5);
-        mockWebServer.enqueue(response1);
-        mockWebServer.enqueue(response2);
-        mockWebServer.enqueue(response3);
-        mockWebServer.enqueue(response4);
-        mockWebServer.enqueue(response5);
+                .setBody(html5));
         mockWebServer.start();
         name = String.format("http://%s:%s", mockWebServer.getHostName(), mockWebServer.getPort());
         url = new Url(name);
